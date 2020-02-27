@@ -1,0 +1,47 @@
+{
+  "audit_epoch": "1529313836.004",
+  "audit_sshd_hostname": "?",
+  "received_at": "2020-02-18T18:39:15.086Z",
+  "message": "type=USER_AUTH msg=audit(1529313836.004:44): pid=1191 uid=0 auid=4294967295 ses=4294967295 msg='op=pubkey acct=\"root\" exe=\"/usr/sbin/sshd\" hostname=? addr=172.30.2.200 terminal=ssh res=failed'",
+  "audit_counter": "44",
+  "acct": "root",
+  "audit_audid": "4294967295",
+  "audit_sshd_result": "failed",
+  "audit_sshd_ip": "172.30.2.200",
+  "audit_sshd_op": "pubkey",
+  "@timestamp": "2020-02-18T18:39:15.086Z",
+  "host": "psnode162.ps.lab",
+  "audit_type": "USER_AUTH",
+  "audit_sshd_terminal": "ssh",
+  "audit_sshd_path": "/usr/sbin/sshd",
+  "@version": "1",
+  "type": "syslog",
+  "path": "/tmp/audit.log",
+  "audit_pid": "1191",
+  "audit_uid": "0",
+  "audit_session": "4294967295",
+  "received_from": "psnode162.ps.lab"
+}
+
+
+message
+acct
+audit_sshd_result
+audit_sshd_ip
+host
+
+{
+  "message": "type=USER_AUTH msg=audit(1582082520.391:89065): pid=5475 uid=0 auid=4294967295 ses=4294967295 msg='op=pubkey acct=\"root\" exe=\"/usr/sbin/sshd\" hostname=? addr=172.30.14.221 terminal=ssh res=failed'",
+  "path": "/tmp/audit.log",
+  "@timestamp": "2020-02-19T04:27:05.152Z",
+  "auth_status": "failed",
+  "received_at": "2020-02-19T04:27:05.152Z",
+  "type": "syslog",
+  "audit_type": "USER_AUTH",
+  "audit_sshd_ip": "172.30.14.221",
+  "@version": "1",
+  "msg": "audit(1582082520.391:89065): pid=5475 uid=0 auid=4294967295 ses=4294967295 msg='op=pubkey acct=\"root\" exe=\"/usr/sbin/sshd\" hostname=?",
+  "host": "psnode162.ps.lab",
+  "terminal": "ssh",
+  "received_from": "psnode162.ps.lab"
+}
