@@ -1,12 +1,9 @@
 package com.hpe.qss
 
 import org.apache.spark.sql._
-import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
-import sys.process._
-import com.mapr.fs.MapRFileSystem
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.FileSystem
+import org.apache.spark.sql.types._
+
 
 
 
@@ -19,26 +16,13 @@ object SecurityLogAnalytics {
 
     import spark.implicits._
 
-    val schema =
-      StructType(
-        StructField("received_at", StructType(StructField("$date", TimestampType, false) :: Nil), false)
-          :: StructField("auth_status", StringType, true)
-          :: StructField("audit_sshd_ip", StringType, true)
-          :: StructField("msg", StringType, true)
-          :: StructField("received_from", StringType, true)
-          :: Nil
-      )
+    val schema = new StructType().add("received_at", TimestampType).add("message", StringType).add("path", StringType).add("@timestamp", TimestampType).add("auth_status", StringType).add("type", StringType).add("audit_type", StringType).add("audit_sshd_ip", StringType).add("@version", StringType).add("msg", StringType).add("host", StringType).add("terminal", StringType).add("received_from", StringType)
 
+    val lines = spark.readStream.format("kafka").option("kafka.bootstrap.servers", "localhost").option("subscribePattern", "/tmp/stream:audit_log").load().select($"value" cast "string" as "json").select(from_json($"json", schema) as "data").select("data.received_at", "data.auth_status", "data.audit_sshd_ip","data.msg", "data.received_from")
 
+    val filteredLines = lines.filter($"audit_sshd_ip".isNotNull) //filter out rows that don't have source IP
 
-    val lines = spark.readStream.format("kafka").option("kafka.bootstrap.servers", "localhost")
-      .option("subscribePattern", "/tmp/stream:audit_log")
-      .load()
-      .select($"value" cast "string" as "json").select(from_json($"json", schema) as "data")
-      .select("data.received_at.$date", "data.auth_status", "data.audit_sshd_ip",
-        "data.msg", "data.received_from")
-
-
-    val query = lines.writeStream.format("console").start().awaitTermination
+    val query = filteredLines.writeStream.format("console").start().awaitTermination
   }
 }
+
