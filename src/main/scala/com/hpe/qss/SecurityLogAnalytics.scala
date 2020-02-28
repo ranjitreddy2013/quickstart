@@ -14,6 +14,8 @@ object SecurityLogAnalytics {
       .appName("Audit Log stream")
       .getOrCreate()
 
+
+
     import spark.implicits._
 
     val schema = new StructType().add("received_at", TimestampType).add("message", StringType).add("path", StringType).add("@timestamp", TimestampType).add("auth_status", StringType).add("type", StringType).add("audit_type", StringType).add("audit_sshd_ip", StringType).add("@version", StringType).add("msg", StringType).add("host", StringType).add("terminal", StringType).add("received_from", StringType)
@@ -22,7 +24,9 @@ object SecurityLogAnalytics {
 
     val filteredLines = lines.filter($"audit_sshd_ip".isNotNull) //filter out rows that don't have source IP
 
-    val query = filteredLines.writeStream.format("console").start().awaitTermination
+    val windowedCounts = filteredLines.groupBy(window($"received_at", s"10 seconds", s"5 seconds"), $"audit_sshd_ip").count().orderBy("window")
+
+    val query = windowedCounts.writeStream.outputMode("complete").format("console").start().awaitTermination
   }
 }
 
