@@ -5,9 +5,10 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.elasticsearch.hadoop.cfg.ConfigurationOptions
+import com.mapr.db.spark.streaming.MapRDBSourceConfig
 
 
-object SecurityLogAnalytics {
+object SecurityLogAnalyticsToDB {
   def main(args: Array[String]) = {
 
     val config = ConfigFactory.load()
@@ -23,6 +24,7 @@ object SecurityLogAnalytics {
     val index = config.getString("spark.elasticsearch.index")
     val docType = config.getString("spark.elasticsearch.doc.type")
     val indexAndDocType = s"$index/$docType"
+    var tableName: String = "/user/mapr/mytable"
 
     val spark: SparkSession = SparkSession.builder()
       .master(master)
@@ -67,14 +69,16 @@ object SecurityLogAnalytics {
       .count()
     //.orderBy("window")
 
-    val query = windowedCounts
-      .writeStream
-      .outputMode(outputMode)
-      .option(ConfigurationOptions.ES_NODES, elasticsearchHost)
-      .option(ConfigurationOptions.ES_PORT, elasticsearchPort)
-      .format(destination)
+
+    val query = windowedCounts.select($"audit_sshd_ip" as "_id", $"count")
+      .writeStream.format(MapRDBSourceConfig.Format)
+      .option(MapRDBSourceConfig.TablePathOption, tableName)
+      .option(MapRDBSourceConfig.IdFieldPathOption, "_id")
+      .option(MapRDBSourceConfig.CreateTableOption, false)
       .option("checkpointLocation", checkpointLocation)
-      .start(indexAndDocType);
+      .option(MapRDBSourceConfig.BulkModeOption, true)
+      .option(MapRDBSourceConfig.SampleSizeOption, 1000)
+      .start()
 
     query.awaitTermination()
 

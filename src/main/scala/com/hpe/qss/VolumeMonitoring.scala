@@ -10,7 +10,7 @@ import org.apache.hadoop.fs.FileSystem
 
 
 
-object Main {
+object VolumeMonitoring {
   def main(args: Array[String]) = {
 
     val spark: SparkSession = SparkSession.builder()
