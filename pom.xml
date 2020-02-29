@@ -33,6 +33,11 @@
       <enabled>true</enabled>
     </releases>
   </repository>
+    <repository>
+      <id>sonatype-oss</id>
+      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
 </repositories>
 
   <pluginRepositories>
@@ -204,6 +209,12 @@
       <version>3.0-mapr-1808</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch-hadoop</artifactId>
+      <version>6.4.1</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -253,6 +264,29 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.hpe.qss.SecurityLogAnalytics</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

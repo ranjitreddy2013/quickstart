@@ -1,16 +1,33 @@
 package com.hpe.qss
 
+import com.typesafe.config.ConfigFactory
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
+import org.elasticsearch.hadoop.cfg.ConfigurationOptions
 
 
 object SecurityLogAnalytics {
   def main(args: Array[String]) = {
 
+    val config = ConfigFactory.load()
+
+    val master = config.getString("spark.master")
+    val appName = config.getString("spark.app.name")
+    val elasticsearchHost = config.getString("spark.elasticsearch.host")
+    val elasticsearchPort = config.getString("spark.elasticsearch.port")
+
+    val outputMode = config.getString("spark.elasticsearch.output.mode")
+    val destination = config.getString("spark.elasticsearch.data.source")
+    val checkpointLocation = config.getString("spark.elasticsearch.checkpoint.location")
+    val index = config.getString("spark.elasticsearch.index")
+    val docType = config.getString("spark.elasticsearch.doc.type")
+    val indexAndDocType = s"$index/$docType"
+
     val spark: SparkSession = SparkSession.builder()
-      .appName("Audit Log stream")
-      .getOrCreate()
+      .master(master)
+      .appName(appName)
+      .getOrCreate();
 
 
     import spark.implicits._
@@ -41,13 +58,27 @@ object SecurityLogAnalytics {
 
     val filteredLines = lines.filter($"audit_sshd_ip".isNotNull) //filter out rows that don't have source IP
 
-    val windowedCounts = filteredLines.groupBy(
-      window($"received_at", s"10 seconds", s"5 seconds"),
-      $"audit_sshd_ip")
+    val windowedCounts = filteredLines
+      .withWatermark("received_at", "10 minutes")
+      .groupBy(
+        window($"received_at", s"10 seconds", s"5 seconds"),
+        $"audit_sshd_ip")
       .count()
-      .orderBy("window")
+    //.orderBy("window")
 
-    val query = windowedCounts.writeStream.outputMode("complete").format("console").start().awaitTermination
+    val query = windowedCounts
+      .writeStream
+      .outputMode(outputMode)
+      .option(ConfigurationOptions.ES_NODES, elasticsearchHost)
+      .option(ConfigurationOptions.ES_PORT, elasticsearchPort)
+      .format(destination)
+      .option("checkpointLocation", checkpointLocation)
+      .start(indexAndDocType);
+
+    query.awaitTermination()
+
+    // For debug purpose use console output
+    //val query = windowedCounts.writeStream.outputMode("complete").format("console").start().awaitTermination
   }
 }
 
