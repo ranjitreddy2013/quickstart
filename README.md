@@ -4,25 +4,31 @@ This is a quick start example to run on HCP container platform.
 Here are the steps to follow, I'm assuming HCP K8S container platform 5.0 is installed and running. You can find the instructions here for installation of HCP.
 http://docs.bluedata.com/50_k8s-getting-started-with-kubernetes
 
-Here are the steps:
+##Here are the steps:
 
-1 Deploy Spark Operator
+#1 Deploy Spark Operator
+```
   git clone https://github.com/mapr/mapr-operators
   cd mapr-operators
   sh bootstrapinstall.sh
+  ```
   
-2 Clone this project 
+#2 Clone this project 
+```
   git clone https://github.com/ranjitreddy2013/quickstart
+  ```
   
-3 Build the project
+#3 Build the project
+```
   cd quickstart
   mvn clean install
+  ```
   
-4. Setup a MapR cluster. You can find steps here for installation of MapR cluster. Note the cluster name, this will be used in creating a cspace in the next step. Copy the jar created in step#3 to maprfs:/tmp/. This will be references in the deployment of Spark example.
+#4. Setup a MapR cluster. You can find steps here for installation of MapR cluster. Note the cluster name, this will be used in creating a cspace in the next step. Copy the jar created in step#3 to maprfs:/tmp/. This will be references in the deployment of Spark example.
    https://mapr.com/docs/61/install.html
 
-5. Create cspace. Take the cluster name from step #4 and update the file cr-cspace-full-vanilla.yaml in mapr-operators/cspaces folder.
-
+#5. Create cspace. Take the cluster name from step #4 and update the file cr-cspace-full-vanilla.yaml in mapr-operators/cspaces folder.
+```
    [root@psnode188 cspaces]# cat cr-cspace-full-vanilla.yaml
 apiVersion: mke.hpe.com/v1
 kind: CSpace
@@ -89,10 +95,11 @@ spec:
     - group1
     - group2
 [root@psnode188 cspaces]# kubectl apply -f cr-cspace-full-vanilla.yaml
+```
 
-5.  Navigate to mapr-operators/examples/spark directory
+#6.  Navigate to mapr-operators/examples/spark directory
   create spark-quickstart.yaml  for the quickstart example as shown below. This is an example taken from mapr-spark-wc.yaml and updated to this example. Here update namespace, serviceAccount, mainClass, mainApplicationFile, 
-  
+  ```
 [root@psnode188 spark]# cat spark-quickstart.yaml 
 
 apiVersion: "sparkoperator.k8s.io/v1beta2"
@@ -140,4 +147,5 @@ NAME                              READY   STATUS    RESTARTS   AGE
       spark-quickstart-driver           1/1     Running   0          16s
       sparkhs-79d5674974-jmr8w          1/1     Running   0          18d
 [root@psnode188 spark]# 
+```
   
