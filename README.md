@@ -131,4 +131,13 @@ spec:
     memory: "512m"
     labels:
       version: 2.4.4
+
 [root@psnode188 spark]# kubectl apply -f spark-quickstart.yaml 
+[root@psnode188 spark]# kubectl get pods -n mycspace2
+NAME                              READY   STATUS    RESTARTS   AGE
+      cspaceterminal-78d5584798-xgfgc   1/1     Running   0          18d
+      hivemeta-6875558dd9-k65cb         1/1     Running   0          18d
+      spark-quickstart-driver           1/1     Running   0          16s
+      sparkhs-79d5674974-jmr8w          1/1     Running   0          18d
+[root@psnode188 spark]# 
+  
