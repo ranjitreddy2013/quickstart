@@ -10,7 +10,7 @@ http://docs.bluedata.com/50_k8s-getting-started-with-kubernetes
 ```
   git clone https://github.com/mapr/mapr-operators
   cd mapr-operators
-  sh bootstrapinstall.sh
+  sh bootstrap/bootstrapinstall.sh
   ```
   
 #2 Clone this project 
